@@ -73,9 +73,13 @@ export class Cache {
 
 export async function getCacheTable() {
   try {
+    if (process.env.ENABLE_CACHE === "false") return
+    // Vercel functions cannot create Nitro's default `.data` directory under
+    // `/var/task`. Keep cache opt-in there unless an external database is
+    // explicitly configured by the operator.
+    if (process.env.VERCEL && process.env.ENABLE_CACHE !== "true") return
     const db = useDatabase()
     // logger.info("db: ", db.getInstance())
-    if (process.env.ENABLE_CACHE === "false") return
     const cacheTable = new Cache(db)
     if (process.env.INIT_TABLE !== "false") await cacheTable.init()
     return cacheTable

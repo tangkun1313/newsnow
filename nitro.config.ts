@@ -36,6 +36,14 @@ if (process.env.VERCEL) {
   // Vercel no longer accepts the deprecated Edge runtime for new anonymous
   // deployments. Use the supported Node.js function runtime instead.
   nitroOption.preset = "vercel"
+  // Nitro's dependency tracer can lose transitive Cheerio packages when a
+  // Vercel build is produced from pnpm on Windows. Bundle the parser stack so
+  // the function never depends on junctions such as `entities` at runtime.
+  nitroOption.externals = {
+    inline: [
+      /boolbase|cheerio|css-select|css-what|dom-serializer|domelementtype|domhandler|domutils|entities|htmlparser2|nth-check|parse5/,
+    ],
+  }
   // You can use other online database, do it yourself. For more info: https://db0.unjs.io/connectors
   nitroOption.database = undefined
   // nitroOption.vercel = {
